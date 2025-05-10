@@ -23,6 +23,27 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (password.length < 8) {
+      toast({
+        title: "Password too short",
+        description: "Password must be at least 8 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+[\]{};:'",.<>/?\\|`~]).{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      toast({
+        title: "Weak password",
+        description:
+          "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     if (password !== confirmPassword) {
       toast({
