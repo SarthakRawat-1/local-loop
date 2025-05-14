@@ -24,6 +24,15 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    if(password.length < 8){
+      toast({
+        title: "Password too short",
+        description: "Password must be at least 8 characters long",
+        variant: "destructive",
+     })
+    return
+    }
+
     if (password !== confirmPassword) {
       toast({
         title: "Passwords don't match",
