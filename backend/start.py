@@ -1,4 +1,3 @@
-#import the required modules
 import asyncio
 import os
 import sys
@@ -8,6 +7,14 @@ import uvicorn
 from app.db.init_db import init_db
 from app.core.config import settings
 
+
+from app.db.base import Base
+from app.db.session import engine
+
+async def create_tables():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+# await create_tables();
 
 async def init_database():
     print("Initializing database...")
@@ -32,6 +39,7 @@ def start_app(host="0.0.0.0", port=8000, reload=True):
 
 
 async def main():
+    await create_tables()
     parser = argparse.ArgumentParser(description="Neighborhood App Backend")
     parser.add_argument(
         "--init-db", action="store_true", help="Initialize the database"

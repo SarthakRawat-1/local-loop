@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, DateTime, Float, ForeignKey, Text, Enum, func
+from sqlalchemy import Column,Integer, String, DateTime, Float, ForeignKey, Text, Enum, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
@@ -35,6 +35,8 @@ class Item(Base):
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
     image = Column(String, nullable=True)
+    count = Column(Integer, nullable=True, default=0)
+
     
     # Foreign key to user
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)

@@ -68,7 +68,8 @@ export const api = {
     getAll: async (filters?: FilterOptions): Promise<Item[]> => {
       try {
         const response = await fetch(
-          `${API_BASE_URL}/items${buildQueryString(filters)}`,
+          `${API_BASE_URL}/api/items`,
+          // `${API_BASE_URL}/api/items${buildQueryString(filters)}`,
           {
             headers: getAuthHeaders(),
           }
@@ -89,7 +90,7 @@ export const api = {
     // Get a single item by ID
     getById: async (id: string): Promise<Item> => {
       try {
-        const response = await fetch(`${API_BASE_URL}/items/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/api/items/${id}`, {
           headers: getAuthHeaders(),
         });
 
@@ -110,7 +111,7 @@ export const api = {
       item: Omit<Item, "id" | "createdAt" | "updatedAt" | "createdBy">
     ): Promise<Item> => {
       try {
-        const response = await fetch(`${API_BASE_URL}/items`, {
+        const response = await fetch(`${API_BASE_URL}/api/items`, {
           method: "POST",
           headers: getAuthHeaders(),
           body: JSON.stringify(item),
@@ -131,7 +132,7 @@ export const api = {
     // Update an existing item
     update: async (id: string, item: Partial<Item>): Promise<Item> => {
       try {
-        const response = await fetch(`${API_BASE_URL}/items/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/api/items/${id}`, {
           method: "PATCH",
           headers: getAuthHeaders(),
           body: JSON.stringify(item),
@@ -152,7 +153,7 @@ export const api = {
     // Delete an item
     delete: async (id: string): Promise<void> => {
       try {
-        const response = await fetch(`${API_BASE_URL}/items/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/api/items/${id}`, {
           method: "DELETE",
           headers: getAuthHeaders(),
         });

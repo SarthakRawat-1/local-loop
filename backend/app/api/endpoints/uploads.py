@@ -8,7 +8,7 @@ from app.utils.image_handler import save_upload_file
 router = APIRouter()
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/uploads", status_code=status.HTTP_201_CREATED)
 async def upload_image(
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_user),

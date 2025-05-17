@@ -39,6 +39,10 @@ class ItemUpdate(BaseModel):
     image: Optional[str] = None
 
 
+class ItemUpdateCount(BaseModel):
+    count: int  # Define the ItemUpdateCount schema here
+
+
 class ItemResponse(BaseModel):
     id: UUID
     title: str
@@ -53,21 +57,22 @@ class ItemResponse(BaseModel):
     created_by: UUID = Field(alias="createdBy")
     created_at: datetime = Field(alias="createdAt")
     updated_at: datetime = Field(alias="updatedAt")
+    count: int
 
     class Config:
         from_attributes = True
         populate_by_name = True
         allow_population_by_field_name = True
-        
+
     @classmethod
     def from_orm(cls, item):
         # Create a copy of the item to avoid modifying the original
         item_copy = item.__dict__.copy()
-        
+
         # Map fields to match frontend expectations
         item_copy["created_by"] = item.user_id
         item_copy["location"] = {"lat": item.latitude, "lng": item.longitude}
-        
+
         return cls.model_validate(item_copy)
 
 

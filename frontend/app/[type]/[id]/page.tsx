@@ -13,6 +13,8 @@ import {
   ArrowLeft,
   Heart,
   Share2,
+  Users, // Import Users icon
+  PlusCircle, // Import PlusCircle icon
 } from "lucide-react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
@@ -35,6 +37,8 @@ export default function ItemDetailPage() {
   const { toast } = useToast();
   const { user } = useAuth();
   const [item, setItem] = useState<Item | null>(null);
+  const [attendeeCount, setAttendeeCount] = useState<number | null>(null);
+  const [hasAttended, setHasAttended] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -60,6 +64,29 @@ export default function ItemDetailPage() {
       fetchItem();
     }
   }, [params.id, toast]);
+
+  useEffect(() => {
+    const fetchAttendeeCount = async () => {
+      try {
+        const res = await fetch(`http://localhost:8000/api/items/${params.id}/count`);
+        const data = await res.json();
+        setAttendeeCount(data.count);
+      } catch (error) {
+        console.error("Failed to fetch attendee count:", error);
+      }
+    };
+
+    // Check if user already attended (from localStorage)
+    const attended = localStorage.getItem(`attended_${params.id}`);
+    if (attended === "true") {
+      setHasAttended(true);
+    }
+
+    if (params.id) {
+      fetchAttendeeCount();
+    }
+  }, [params.id]);
+
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -107,6 +134,41 @@ export default function ItemDetailPage() {
     }
   };
 
+  const handleDelete = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!item || !item.id) return;
+
+    if (!token) {
+      toast({
+        title: "Unauthorized",
+        description: "You must be logged in to delete items.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const confirmDelete = window.confirm("Are you sure you want to delete this item?");
+    if (!confirmDelete) return;
+
+    try {
+      await api.items.delete(item.id);
+      toast({
+        title: "Deleted",
+        description: "Item has been successfully deleted.",
+        variant: "default",
+      });
+      router.push("/");
+    } catch (error) {
+      console.error("Delete failed:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete the item.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="container py-12">
@@ -137,7 +199,6 @@ export default function ItemDetailPage() {
       </Button>
 
       <div className="flex flex-col gap-8">
-        {/* Top section with image and basic info */}
         <div className="grid md:grid-cols-2 gap-8">
           <div className="relative aspect-video rounded-lg overflow-hidden shadow-md">
             <Image
@@ -156,9 +217,8 @@ export default function ItemDetailPage() {
             <div className="flex items-start justify-between">
               <div>
                 <Badge
-                  className={`${
-                    item.type === "event" ? "bg-primary-600" : "bg-green-600"
-                  } mb-2`}
+                  className={`${item.type === "event" ? "bg-primary-600" : "bg-green-600"
+                    } mb-2`}
                 >
                   {item.type === "event" ? "Event" : "Deal"}
                 </Badge>
@@ -173,6 +233,9 @@ export default function ItemDetailPage() {
                 </Button>
                 <Button variant="outline" size="icon" onClick={handleShare}>
                   <Share2 className="h-4 w-4" />
+                </Button>
+                <Button variant="destructive" onClick={handleDelete}>
+                  Delete
                 </Button>
               </div>
             </div>
@@ -194,6 +257,64 @@ export default function ItemDetailPage() {
               <span>{item.address}</span>
             </div>
 
+
+
+            {attendeeCount === null ? (
+              <div className="mt-4 text-sm text-gray-500">Loading attendee info...</div>
+            ) : (
+              <div className="mt-4 flex items-center justify-between">
+                <div className=" text-gray-600 flex items-center">
+                  <Users className="h-5 w-5 mr-2 text-primary-600" />
+                  <span>Attendees: {attendeeCount}</span>
+                </div>
+                
+                <Button
+                  variant={hasAttended ? "default" : "secondary"}
+                  size="sm"
+                  disabled={hasAttended}
+                  className={
+                    hasAttended
+                      ? "bg-green-600 text-white hover:bg-green-700 cursor-not-allowed"
+                      : "bg-blue-600 text-white hover:bg-blue-700"
+                  }
+                  onClick={async () => {
+                    let token = localStorage.getItem("token")
+                    try {
+                      const res = await fetch(`http://localhost:8000/api/items/${params.id}/count`, {
+                        method: "PATCH",
+                        headers: {
+
+                          "Content-Type": "application/json",
+                          "Authorization": `Bearer ${token}`,
+                        },
+                      });
+
+                      if (!res.ok) throw new Error("Failed to update count");
+
+                      const data = await res.json();
+                      setAttendeeCount(data.count);
+                      setHasAttended(true);
+                      localStorage.setItem(`attended_${params.id}`, "true");
+
+                      toast({
+                        title: "You're attending!",
+                        description: "Thanks for confirming your attendance.",
+                      });
+                    } catch (error) {
+                      console.error("Attendance error:", error);
+                      toast({
+                        title: "Error",
+                        description: "Could not mark attendance.",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                >
+                  
+                  {hasAttended ? "Attending" : "Attend"}
+                </Button>
+              </div>
+            )}
             <div className="mt-6 text-sm text-gray-500 flex items-center">
               <Clock className="h-4 w-4 mr-1" />
               <span>
@@ -203,7 +324,6 @@ export default function ItemDetailPage() {
           </div>
         </div>
 
-        {/* Description section */}
         <div className="bg-white p-6 rounded-lg shadow-sm">
           <h2 className="text-xl font-bold mb-4">Description</h2>
           <p className="text-gray-700 whitespace-pre-line">
@@ -211,25 +331,20 @@ export default function ItemDetailPage() {
           </p>
         </div>
 
-        {/* Map section - full width */}
         <div className="bg-white p-6 rounded-lg shadow-sm">
           <h2 className="text-xl font-bold mb-4">Location</h2>
           <div className="h-[400px] rounded-lg overflow-hidden">
-            {/* Log the data being passed to DetailMapComponent */}
-            {(() => {
-              console.log("Rendering DetailMapComponent with:", {
-                location: item.location,
-                address: item.address,
-              });
-              return null;
-            })()}
             <DetailMapComponent
               location={item.location}
               address={item.address}
             />
           </div>
+
+
         </div>
+
       </div>
     </div>
   );
 }
+

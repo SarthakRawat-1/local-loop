@@ -7,7 +7,7 @@ from uuid import UUID
 from app.db.database import get_db
 from app.models.item import Item, ItemType, CategoryEnum
 from app.models.user import User
-from app.schemas.item import ItemCreate, ItemResponse, ItemUpdate, FilterOptions
+from app.schemas.item import ItemCreate, ItemResponse, ItemUpdate,ItemUpdateCount, FilterOptions
 from app.middleware.auth import get_current_user
 from app.utils.location import get_bounding_box, calculate_distance
 
@@ -109,7 +109,8 @@ async def get_items(
             "image": item.image,
             "createdBy": str(item.user_id),
             "createdAt": item.created_at.isoformat(),
-            "updatedAt": item.updated_at.isoformat()
+            "updatedAt": item.updated_at.isoformat(),
+             "count": item.count
         }
         
         if lat is not None and lng is not None:
@@ -155,7 +156,8 @@ async def get_item(
         "image": item.image,
         "createdBy": str(item.user_id),
         "createdAt": item.created_at.isoformat(),
-        "updatedAt": item.updated_at.isoformat()
+        "updatedAt": item.updated_at.isoformat(),
+        "count": item.count
     }
     
     return item_dict
@@ -179,6 +181,7 @@ async def create_item(
         longitude=item_in.location.lng,
         image=item_in.image,
         user_id=current_user.id,
+        count=0,
     )
     
     db.add(new_item)
@@ -201,7 +204,8 @@ async def create_item(
         "image": new_item.image,
         "createdBy": str(new_item.user_id),
         "createdAt": new_item.created_at.isoformat(),
-        "updatedAt": new_item.updated_at.isoformat()
+        "updatedAt": new_item.updated_at.isoformat(),
+         "count": new_item.count
     }
     
     return item_dict
@@ -256,7 +260,8 @@ async def update_item(
         "image": item.image,
         "createdBy": str(item.user_id),
         "createdAt": item.created_at.isoformat(),
-        "updatedAt": item.updated_at.isoformat()
+        "updatedAt": item.updated_at.isoformat(),
+        "count": item.count
     }
     
     return item_dict
@@ -285,3 +290,49 @@ async def delete_item(
 
     await db.delete(item)
     await db.commit()
+
+@router.patch("/{item_id}/count", response_model=ItemResponse)
+async def update_item_count(
+    item_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    query = await db.execute(select(Item).where(Item.id == item_id))
+    item = query.scalar_one_or_none()
+
+    if not item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Item not found",
+        )
+
+    # You might want to add authorization checks here to ensure
+    # only authorized users can update the count. For example:
+    if item.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to update this item's count",
+        )
+
+    item.count += 1 # Increment the count by 1
+    await db.commit()
+    await db.refresh(item)
+
+    # Construct the response dictionary using the from_orm method
+    return ItemResponse.from_orm(item)
+
+@router.get("/{item_id}/count")
+async def get_item_count(
+    item_id: UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    query = await db.execute(select(Item.count).where(Item.id == item_id))
+    count = query.scalar_one_or_none()
+
+    if count is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Item not found",
+        )
+
+    return {"count": count}

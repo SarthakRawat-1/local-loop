@@ -114,6 +114,7 @@ export function ListView({ items, loading = false }: ListViewProps) {
             <CardContent className="pb-2">
               <p className="text-sm text-gray-600 line-clamp-2 mb-3">
                 {item.description}
+                
               </p>
               <div className="flex items-center text-sm mt-2 text-gray-600">
                 <Calendar className="w-4 h-4 mr-1 text-primary-600" />
