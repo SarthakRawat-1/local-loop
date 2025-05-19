@@ -44,3 +44,71 @@ export interface FilterOptions {
   radius?: number
   createdBy?: string  // Added to filter items by creator
 }
+/**
+ * Represents the result of a single environment status check
+ */
+export interface StatusCheck {
+  /**
+   * Name of the check performed
+   */
+  name: string;
+  
+  /**
+   * Status result of the check
+   */
+  status: 'ok' | 'warning' | 'error';
+  
+  /**
+   * Human-readable message describing the check result
+   */
+  message: string;
+}
+
+/**
+ * Comprehensive report of all status checks
+ */
+export interface StatusReport {
+  /**
+   * Array of individual check results
+   */
+  checks: StatusCheck[];
+  
+  /**
+   * Summary counts of check statuses
+   */
+  summary: {
+    ok: number;
+    warnings: number;
+    errors: number;
+  };
+  
+  /**
+   * Timestamp when the report was generated
+   */
+  timestamp: number;
+}
+
+/**
+ * Configuration options for the status checker
+ */
+export interface StatusCheckerOptions {
+  /**
+   * Root directory of the project to check
+   */
+  projectRoot?: string;
+  
+  /**
+   * Custom environment variables to check for
+   */
+  requiredEnvVars?: string[];
+  
+  /**
+   * Custom files to check for
+   */
+  requiredFiles?: string[];
+  
+  /**
+   * Custom ports to check availability
+   */
+  portsToCheck?: number[];
+}
