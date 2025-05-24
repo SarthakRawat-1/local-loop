@@ -2,6 +2,7 @@
 
 import type React from "react"
 
+
 import { createContext, useContext, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 
@@ -184,7 +185,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     router.push("/login")
   }
-
   return <AuthContext.Provider value={{ user, login, signup, logout, isLoading, token }}>{children}</AuthContext.Provider>
 }
 
