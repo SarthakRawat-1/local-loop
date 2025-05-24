@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
+import PasswordInput from "/workspaces/local-loop/frontend/components/PasswordInput"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -70,13 +71,12 @@ export default function LoginPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  required
+                <PasswordInput
+                  name="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full"
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="Password"
+                  required
                 />
               </div>
             </div>
