@@ -36,6 +36,8 @@ LocalLoop/
 
 ## 🚀 Getting Started
 
+## Manual Installation
+
 ### 🧰 Prerequisites
 
 - Node.js v18+
@@ -76,6 +78,77 @@ cd ../frontend
 
 pnpm install
 pnpm dev
+```
+
+## Docker installation
+
+### Prerequisites
+- Docker
+- Docker Compose
+
+### 1. Start the Application
+```bash
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
+
+### 2. Access the Application
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
+- PostgreSQL: localhost:5432
+
+### 3. Useful Commands
+```bash
+# Rebuild and restart
+docker-compose up --build
+
+# Access backend container
+docker-compose exec backend bash
+
+# Access frontend container
+docker-compose exec frontend sh
+
+# Access database
+docker-compose exec postgres psql -U postgres -d postgres
+
+# View specific service logs
+docker-compose logs -f backend
+docker-compose logs -f frontend
+
+# Restart specific service
+docker-compose restart backend
+docker-compose restart frontend
+```
+
+### 4. Development Workflow
+- Code changes in `./backend` and `./frontend` are automatically synced
+- Backend restarts automatically on code changes
+- Frontend has hot reload enabled
+- Database data persists between container restarts
+
+### 5. Environment Variables
+The backend uses your existing `.env` file with these Docker-specific overrides:
+- `DATABASE_URL` points to the postgres container
+- `CORS_ORIGINS` already includes localhost:3000
+
+### 6. Troubleshooting
+```bash
+# If database connection fails
+docker-compose restart postgres
+docker-compose logs postgres
+
+# If backend fails to start
+docker-compose logs backend
+
+# Clean restart
+docker-compose down -v
+docker-compose up --build
 ```
 
 Then open `http://localhost:3000` in your browser.
