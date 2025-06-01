@@ -60,6 +60,7 @@ cd neighborhood-app
 
 ```bash
 cd backend
+
 python -m venv venv
 # On Windows
 venv\Scripts\activate
@@ -85,6 +86,9 @@ pnpm dev
 ### Prerequisites
 - Docker
 - Docker Compose
+
+### Backend Env
+Enter your custom .env or use the .env.example
 
 ### 1. Start the Application
 ```bash
