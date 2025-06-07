@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password_input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Moon, Sun } from "lucide-react"
@@ -23,7 +24,20 @@ export default function SignupPage() {
   const { toast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  e.preventDefault()
+
+  const strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/
+
+  if (!strongPasswordRegex.test(password)) {
+    //To enforce a strong password (e.g. minimum 8 characters, must include a letter, a number, and a special character)
+      toast({
+        title: "Weak password",
+        description:
+          "Password must be at least 8 characters long and include at least one letter, one number, and one special character.",
+        variant: "destructive",
+      })
+      return
+    }
 
     if (password !== confirmPassword) {
       toast({
@@ -32,6 +46,8 @@ export default function SignupPage() {
         variant: "destructive",
       })
       return
+    }
+
     }
 
     setIsLoading(true)
@@ -69,7 +85,6 @@ export default function SignupPage() {
             <h2 className="text-xl font-semibold text-foreground border-b border-border pb-2 text-center">
               Account Information
             </h2>
-            
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium text-foreground">
@@ -104,7 +119,7 @@ export default function SignupPage() {
                 <Label htmlFor="password" className="text-sm font-medium text-foreground">
                   Password
                 </Label>
-                <Input
+                <PasswordInput
                   id="password"
                   type="password"
                   required
@@ -118,7 +133,7 @@ export default function SignupPage() {
                 <Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
                   Confirm Password
                 </Label>
-                <Input
+                <PasswordInput
                   id="confirmPassword"
                   type="password"
                   required
