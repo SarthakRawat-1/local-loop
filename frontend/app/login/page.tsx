@@ -84,11 +84,10 @@ export default function LoginPage() {
                 <Label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">Password</Label>
                 <PasswordInput
                   id="password"
-                  type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white dark:bg-[#020817] border-gray-300 dark:border-gray-600 text-[#010817] dark:text-white"
+                  className="w-full bg-background border-input"
                 />
               </div>
             </div>
