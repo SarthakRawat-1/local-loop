@@ -49,7 +49,8 @@ Copy the `.env` file in the `app` directory and update it with your PostgreSQL c
 5. Initialize the database:
 
 ```bash
-# Make sure PostgreSQL is running
+# Make sure PostgreSQL is running 
+# Match sqlalchemy with psycopg2 or asyncpg or else it breaks and does not initialise
 python start.py --init-db
 ```
 
