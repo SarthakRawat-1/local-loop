@@ -24,12 +24,11 @@ export default function SignupPage() {
   const { toast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
+    e.preventDefault()
 
-  const strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/
+    const strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/
 
-  if (!strongPasswordRegex.test(password)) {
-    //To enforce a strong password (e.g. minimum 8 characters, must include a letter, a number, and a special character)
+    if (!strongPasswordRegex.test(password)) {
       toast({
         title: "Weak password",
         description:
@@ -46,8 +45,6 @@ export default function SignupPage() {
         variant: "destructive",
       })
       return
-    }
-
     }
 
     setIsLoading(true)
@@ -70,7 +67,6 @@ export default function SignupPage() {
       setIsLoading(false)
     }
   }
-
   return (
     <div className="container py-8 min-h-screen bg-background">
       <div className="mx-auto max-w-2xl bg-card p-8 rounded-lg shadow-sm border">
