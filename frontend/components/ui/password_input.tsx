@@ -1,15 +1,16 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
-import { Eye, EyeOff } from "lucide-react"
-import { useState} from "react"
+"use client";
+
+import * as React from "react";
+import { cn } from "@/lib/utils";
+import { Eye, EyeOff } from "lucide-react";
 
 const PasswordInput = React.forwardRef<
   HTMLInputElement,
   React.InputHTMLAttributes<HTMLInputElement>
 >(({ className, ...props }, ref) => {
-  const [showPassword, setShowPassword] = React.useState(false)
+  const [showPassword, setShowPassword] = React.useState(false);
 
-  const togglePassword = () => setShowPassword((prev) => !prev)
+  const togglePassword = () => setShowPassword((prev) => !prev);
 
   return (
     <div className="relative w-full">
@@ -31,9 +32,9 @@ const PasswordInput = React.forwardRef<
         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
       </button>
     </div>
-  )
-})
+  );
+});
 
-PasswordInput.displayName = "PasswordInput"
+PasswordInput.displayName = "PasswordInput";
 
-export { PasswordInput }
+export { PasswordInput };
