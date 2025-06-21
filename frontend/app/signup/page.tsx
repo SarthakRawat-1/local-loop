@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth-provider";
@@ -17,21 +17,46 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordScore, setPasswordScore] = useState(0);
   const { signup } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
+  useEffect(() => {
+    const checkStrength = async () => {
+      if (!password) {
+        setPasswordScore(0);
+        return;
+      }
+      const { default: zxcvbn } = await import("zxcvbn");
+      const result = zxcvbn(password);
+      setPasswordScore(result.score);
+    };
+    checkStrength();
+  }, [password]);
+
+  const getStrengthLabel = (score: number) => {
+    return ["Very Weak", "Weak", "Fair", "Good", "Strong"][score];
+  };
+
+  const getStrengthColor = (score: number) => {
+    return [
+      "bg-red-500",
+      "bg-orange-500",
+      "bg-yellow-500",
+      "bg-blue-500",
+      "bg-green-500",
+    ][score];
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const strongPasswordRegex =
-      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
-
-    if (!strongPasswordRegex.test(password)) {
+    if (passwordScore < 3) {
       toast({
         title: "Weak password",
         description:
-          "Password must be at least 8 characters long and include at least one letter, one number, and one special character.",
+          "Password must be stronger. Try using a mix of upper/lowercase, numbers, and symbols.",
         variant: "destructive",
       });
       return;
@@ -117,6 +142,26 @@ export default function SignupPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-background border-input"
                 />
+                {password && (
+                  <div className="mt-1 space-y-1">
+                    <div className="h-2 w-full rounded bg-muted relative">
+                      <div
+                        className={`absolute top-0 left-0 h-full rounded transition-all duration-300 ${getStrengthColor(
+                          passwordScore
+                        )}`}
+                        style={{
+                          width: `${(passwordScore / 4) * 100}%`,
+                        }}
+                      ></div>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Strength:{" "}
+                      <span className="font-medium text-foreground">
+                        {getStrengthLabel(passwordScore)}
+                      </span>
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
