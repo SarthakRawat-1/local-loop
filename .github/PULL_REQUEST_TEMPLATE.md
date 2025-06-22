@@ -17,7 +17,7 @@ Please include a summary of the changes and any related issue. If this PR addres
 
 ## ✅ Checklist
 
-- [ ] I have read the [Contributing Guidelines](./CONTRIBUTING.md)
+- [ ] I have read the [Contributing Guidelines](../CONTRIBUTING.md)
 - [ ] My code follows the project's style guidelines
 - [ ] I have updated documentation if necessary
 

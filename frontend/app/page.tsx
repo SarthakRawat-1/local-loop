@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { MapPin, Calendar, Tag, Search, Users, TrendingUp, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/components/auth-provider";
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
@@ -17,6 +18,7 @@ export default function HomePage() {
   if (!mounted) {
     return null;
   }
+  const { user } = useAuth();
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -193,18 +195,18 @@ export default function HomePage() {
               deals every day.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/signup">
+              <Link href= {`${user ? "/profile" : "/signup"}`}>
                 <Button
                   size="lg"
                   className="bg-white text-primary-700 hover:bg-white/90 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200 rounded-full px-8 shadow-md"
                 >
-                  Sign Up Free
+                  {user ? "Go to Profile" : "Sign Up Free"}
                 </Button>
               </Link>
-              <Link href="/login">
+              <Link href="/login" className= {``}>
                 <Button
                   size="lg"
-                  className="bg-white text-primary-700 hover:bg-white/90 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200 rounded-full px-8 shadow-md"
+                  className = {`bg-white ${user ? "hidden" : "visible"} text-primary-700 hover:bg-white/90 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200 rounded-full px-8 shadow-md`}
                 >
                   Log In
                 </Button>
