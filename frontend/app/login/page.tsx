@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password_input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 
@@ -81,13 +82,12 @@ export default function LoginPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">Password</Label>
-                <Input
+                <PasswordInput
                   id="password"
-                  type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white dark:bg-[#020817] border-gray-300 dark:border-gray-600 text-[#010817] dark:text-white"
+                  className="w-full bg-background border-input"
                 />
               </div>
             </div>
