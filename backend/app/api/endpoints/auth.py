@@ -86,3 +86,65 @@ async def update_profile(
     await db.refresh(current_user)
     
     return current_user
+from pydantic import BaseModel
+
+class OAuthLoginRequest(BaseModel):
+    email: str
+    name: str
+
+@router.post("/oauth-login", response_model=Token)
+async def oauth_login(
+    data: OAuthLoginRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(User.__table__.select().where(User.email == data.email))
+    user = query.scalar_one_or_none()
+
+    if not user:
+        # Create a new user (without password)
+        user = User(
+            email=data.email,
+            name=data.name,
+            hashed_password=get_password_hash("oauth_placeholder_password")  # optional
+        )
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+
+    # Generate access token
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(subject=user.id, expires_delta=access_token_expires)
+
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post("/oauth-signup", response_model=Token)
+async def oauth_signup(
+    data: OAuthLoginRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    query = await db.execute(User.__table__.select().where(User.email == data.email))
+    user = query.scalar_one_or_none()
+
+    if user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered. Please login instead.",
+        )
+
+    # Create a new user without a password
+    new_user = User(
+        email=data.email,
+        name=data.name,
+        hashed_password=get_password_hash("oauth_placeholder_password")  # optional dummy
+    )
+
+    db.add(new_user)
+    await db.commit()
+    await db.refresh(new_user)
+
+    # Generate access token
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(subject=new_user.id, expires_delta=access_token_expires)
+
+    return {"access_token": access_token, "token_type": "bearer"}

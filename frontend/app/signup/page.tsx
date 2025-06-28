@@ -1,17 +1,23 @@
 "use client";
 
-import type React from "react";
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/components/auth-provider";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/password_input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
+import type React from "react"
+import { useState } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/components/auth-provider"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { useToast } from "@/hooks/use-toast"
+import { Moon, Sun } from "lucide-react"
+import { signIn } from "next-auth/react"
+
 
 export default function SignupPage() {
+  
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+  const githubClientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -107,6 +113,7 @@ export default function SignupPage() {
             <h2 className="text-xl font-semibold text-foreground border-b border-border pb-2 text-center">
               Account Information
             </h2>
+
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
@@ -129,7 +136,6 @@ export default function SignupPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-background border-input"
                 />
               </div>
 
@@ -140,7 +146,6 @@ export default function SignupPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-background border-input"
                 />
                 {password && (
                   <div className="mt-1 space-y-1">
@@ -171,7 +176,6 @@ export default function SignupPage() {
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full bg-background border-input"
                 />
               </div>
             </div>
@@ -196,6 +200,43 @@ export default function SignupPage() {
             </div>
           </div>
         </form>
+
+        {/* Social Login Section */}
+        {(googleClientId || githubClientId) && (
+          <div className="my-6 border-t border-gray-200 dark:border-gray-600 pt-6">
+            <p className="text-center text-sm text-gray-600 dark:text-gray-400 mb-4">Or continue with</p>
+            <div className="flex justify-center gap-4">
+              {googleClientId && (
+                <Button
+                  variant="outline"
+                  onClick={() => signIn("google")}
+                  className="flex items-center gap-2"
+                >
+                  <img
+                    src="https://www.svgrepo.com/show/475656/google-color.svg"
+                    alt="Google"
+                    className="w-5 h-5"
+                  />
+                  Google
+                </Button>
+              )}
+              {githubClientId && (
+                <Button
+                  variant="outline"
+                  onClick={() => signIn("github")}
+                  className="flex items-center gap-2"
+                >
+                  <img
+                    src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                    alt="GitHub"
+                    className="w-5 h-5 bg-white rounded-full"
+                  />
+                  GitHub
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
